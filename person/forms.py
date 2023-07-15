@@ -1,22 +1,32 @@
 from django import forms
 
-from person.models import Person, City,Country
+from person.models import Consumer, Zone, Division, SubDivision
 
 
 class PersonCreationForm(forms.ModelForm):
     class Meta:
-        model = Person
+        model = Consumer
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['city'].queryset = City.objects.none()
+        self.fields['division'].queryset = Division.objects.none()
+        self.fields['subdivision'].queryset = SubDivision.objects.none()
 
-        if 'country' in self.data:
+        if 'zone' in self.data:
             try:
-                country_id = int(self.data.get('country'))
-                self.fields['city'].queryset = City.objects.filter(country_id=country_id).order_by('name')
+                zone_id = int(self.data.get('zone'))
+                self.fields['division'].queryset = Division.objects.filter(zone_id=zone_id).order_by('name')
             except (ValueError, TypeError):
-                pass  # invalid input from the client; ignore and fallback to empty City queryset
+                pass  # invalid input from the client; ignore and fallback to empty division queryset
+
+        if 'division' in self.data:
+            try:
+                division_id = int(self.data.get('division'))
+                self.fields['subdivision'].queryset = SubDivision.objects.filter(division_id=division_id).order_by('name')
+            except (ValueError, TypeError):
+                pass  # invalid input from the client; ignore and fallback to empty Subdivision queryset
+
         elif self.instance.pk:
-            self.fields['city'].queryset = self.instance.country.city_set.order_by('name')
+            self.fields['division'].queryset = self.instance.zone.division_set.order_by('name')
+            self.fields['subdivision'].queryset = self.instance.division.subdivision_set.order_by('name')

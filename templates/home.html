@@ -8,9 +8,9 @@
     <title>Dependent Dropdown in Django</title>
 </head>
 <body>
-<h2>Person Form</h2>
+<h2>Consumer Form</h2>
 
-<form method="post" id="personForm" data-cities-url="{% url 'ajax_load_cities' %}">
+<form method="post" id="personForm" data-divisions-url="{% url 'ajax_load_division' %}" data-subdivisions-url= "{% url 'ajax_load_subdivision' %}">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Submit">
@@ -18,30 +18,54 @@
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script>
-    $("#id_country").change(function () {
-        const url = $("#personForm").attr("data-cities-url");  // get the url of the `load_cities` view
-        const countryId = $(this).val();  // get the selected country ID from the HTML input
+    $("#id_zone").change(function () {
+        const url = $("#personForm").attr("data-divisions-url");  // get the url of the `load_cities` view
+        const zoneId = $(this).val();  // get the selected zone ID from the HTML input
 
         $.ajax({                       // initialize an AJAX request
             url: url,                    // set the url of the request (= /persons/ajax/load-cities/ )
             data: {
-                'country_id': countryId       // add the country id to the GET parameters
+                'zone_id': zoneId       // add the zone id to the GET parameters
             },
             success: function (data) {   // `data` is the return of the `load_cities` view function
-                $("#id_city").html(data);  // replace the contents of the city input with the data that came from the server
+                $("#id_division").html(data);  // replace the contents of the division input with the data that came from the server
                 /*
 
                 let html_data = '<option value="">---------</option>';
-                data.forEach(function (city) {
-                    html_data += `<option value="${city.id}">${city.name}</option>`
+                data.forEach(function (division) {
+                    html_data += `<option value="${division.id}">${division.name}</option>`
                 });
                 console.log(html_data);
-                $("#id_city").html(html_data);
+                $("#id_division").html(html_data);
 
                 */
             }
         });
+    });
 
+    $("#id_division").change(function () {
+            const url = $("#personForm").attr("data-subdivisions-url");  // get the url of the `load_cities` view
+            const divisionId = $(this).val();  // get the selected zone ID from the HTML input
+    
+            $.ajax({                       // initialize an AJAX request
+                url: url,                    // set the url of the request (= /persons/ajax/load-cities/ )
+                data: {
+                    'division_id': divisionId       // add the zone id to the GET parameters
+                },
+                success: function (data) {   // `data` is the return of the `load_cities` view function
+                    $("#id_subdivision").html(data);  // replace the contents of the division input with the data that came from the server
+                    /*
+    
+                    let html_data = '<option value="">---------</option>';
+                    data.forEach(function (division) {
+                        html_data += `<option value="${division.id}">${division.name}</option>`
+                    });
+                    console.log(html_data);
+                    $("#id_division").html(html_data);
+    
+                    */
+                }
+            });
     });
 </script>
 
